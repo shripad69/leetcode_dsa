@@ -1,0 +1,42 @@
+# Define pipeline execution rules
+workflow:
+  rules:
+    # Trigger only if run from the Web UI AND the access token is explicitly provided
+    - if: '$CI_PIPELINE_SOURCE == "web" && $GITLAB_ACCESS_TOKEN != null && $GITLAB_ACCESS_TOKEN != ""'
+    - when: never
+
+stages:
+  - review
+
+# Run the automated AI code review process
+ai_review:
+  stage: review
+  image: ubuntu:24.04
+  script:
+    # Validate that required tokens are present
+    - test -n "$COPILOT_GITHUB_TOKEN"
+    - test -n "$GITLAB_ACCESS_TOKEN"
+
+    # Install base utility dependencies
+    - apt-get update
+    - apt-get install -y curl git python3
+
+    # Clone the review framework codebase from GitLab
+    - git clone "https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/shripad69/tcx_gatekeeper.git" framework
+
+    # Configure GPG keys for the official GitHub CLI repository
+    - curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg -o githubcli.gpg
+    - mkdir -p /usr/share/keyrings
+    - mv githubcli.gpg /usr/share/keyrings/githubcli-archive-keyring.gpg
+    - chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+
+    # Add the repository source and install GitHub CLI
+    - echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main' > /etc/apt/sources.list.d/github-cli.list
+    - apt-get update
+    - apt-get install -y gh
+
+    # Configure authentication credentials and execute the review script
+    - export GH_TOKEN="$COPILOT_GITHUB_TOKEN"
+    - export GITHUB_TOKEN="$COPILOT_GITHUB_TOKEN"
+    - gh auth status
+    - python3 framework/src/code_review/review.py
