@@ -1,0 +1,22 @@
+Here are the 10 core things you learned from this project, explained in plain and simple English:
+📋 Core Learning Points
+
+    1. GitLab Comments vs. Threads: I learned that standard comments on the main timeline use one API endpoint (/notes), while line-by-line code review comments require creating a discussion thread (/discussions).
+
+    2. Positioning Inline Comments: I learned that to place an AI comment on an exact line of code, you have to provide specific commit IDs called diff_refs to tell GitLab where the line belongs.
+
+    3. Fetching Full MR Details: I discovered that searching for a Merge Request by its branch name only returns a basic summary without line data. You have to use that summary to get the MR ID, then make a second API call to get the full details.
+
+    4. Handling Draft MRs: I learned that GitLab considers Draft Merge Requests as officially "opened." Because of this, the branch-searching code automatically works for draft versions without any changes.
+
+    5. Built-in Python Libraries: I learned how to send network requests and parse data using Python's built-in tools (urllib and json) instead of installing external packages like requests.
+
+    6. Code Simplification: I learned how to use dictionary comprehensions in Python to match file paths with their contents cleanly in a single line of code instead of using long loops.
+
+    7. Running Git in Python: I learned how to use the subprocess module to run Git commands from inside a script, and why using check=True is necessary to crash the script safely if a command fails.
+
+    8. Finding Changed Files Only: I learned how to use Git's triple-dot syntax (...) to compare branches so the script only picks up the files that were actually modified in the feature branch.
+
+    9. Reading Files Without Switching: I learned that the git show command allows the script to read the text inside a file directly from the repository index without needing to switch or checkout branches locally.
+
+    10. Automated Pipeline Input: I learned how to use built-in GitLab variables like CI_COMMIT_REF_NAME to automatically detect the branch name. This removes the need for developers to manually look up and type in the Merge Request ID.
